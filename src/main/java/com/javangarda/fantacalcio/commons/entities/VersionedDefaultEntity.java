@@ -4,9 +4,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.time.Instant;
 
 @MappedSuperclass
@@ -16,10 +14,8 @@ public class VersionedDefaultEntity<T> extends DefaultEntity<T> {
     @Version
     private Long version;
 
-    @CreatedDate
     private Instant createdDateTime;
 
-    @LastModifiedDate
     private Instant updatedDateTime;
 
     public VersionedDefaultEntity() {
@@ -28,5 +24,15 @@ public class VersionedDefaultEntity<T> extends DefaultEntity<T> {
 
     public VersionedDefaultEntity(T id){
         super(id);
+    }
+
+    @PrePersist
+    public void updateCreatedDateTime(){
+        this.createdDateTime=Instant.now();
+    }
+
+    @PreUpdate
+    public void refreshModificationDateTime(){
+        this.updatedDateTime=Instant.now();
     }
 }
